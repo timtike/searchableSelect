@@ -1,0 +1,42 @@
+.searchable-select {
+  min-width: 224px;
+  font-size: 11px;
+  outline: none;
+}
+
+.searchable-select-holder{
+  display: none;
+  /*padding: 1px;*/
+  min-height: 16px;
+}
+
+.searchable-select-caret {
+  display: none;
+
+}
+
+.searchable-select-dropdown {
+   border-top: none; 
+}
+
+.searchable-select-input {
+  margin-top: 3px;
+  border: 2px solid rgb(153,190,218);
+  background: rgb(242,248,252);
+  font-family: sans-serif;
+}
+
+.searchable-select-item {
+  padding: 5px 0px;
+  min-height: 22px;
+  font-family: sans-serif;
+}
+
+.searchable-select-item.hover {
+
+  background: rgb(71,146,244);
+}
+
+.searchable-select-item.selected {
+  background: rgb(71,146,244);
+}

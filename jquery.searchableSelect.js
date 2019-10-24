@@ -7,7 +7,9 @@
   // a case insensitive jQuery :contains selector
   $.expr[":"].searchableSelectContains = $.expr.createPseudo(function(arg) {
     return function( elem ) {
-      return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+      // fuzzy search: split input content by space
+      reg = arg.toUpperCase().split(' ').join('.*');
+      return $(elem).text().toUpperCase().search(reg) >= 0;
     };
   });
 
@@ -28,7 +30,8 @@
       }
     });
 
-    $(document).on('click', null, function(event){
+    // change mouse event from click to mousedown
+    $(document).on('mousedown', null, function(event){
       if(_this.searchableElement.has($(event.target)).length === 0)
         _this.hide();
     });
@@ -68,7 +71,8 @@
       this.searchableElement = $('<div tabindex="0" class="searchable-select"></div>');
       this.holder = $('<div class="searchable-select-holder"></div>');
       this.dropdown = $('<div class="searchable-select-dropdown searchable-select-hide"></div>');
-      this.input = $('<input type="text" class="searchable-select-input" />');
+      // add placeholder in input
+      this.input = $('<input type="text" class="searchable-select-input"  placeholder="Search..." />');
       this.items = $('<div class="searchable-select-items"></div>');
       this.caret = $('<span class="searchable-select-caret"></span>');
 
@@ -104,7 +108,7 @@
         clearTimeout(_this.hasPriviousTimer);
       });
 
-      this.dropdown.append(this.input);
+      // this.dropdown.append(this.input);
       this.dropdown.append(this.scrollPart);
 
       this.scrollPart.append(this.hasPrivious);
@@ -113,6 +117,8 @@
 
       this.searchableElement.append(this.caret);
       this.searchableElement.append(this.holder);
+      // add input in init func
+      this.searchableElement.append(this.input);
       this.searchableElement.append(this.dropdown);
       this.element.after(this.searchableElement);
 
@@ -120,10 +126,24 @@
       this.setPriviousAndNextVisibility();
     },
 
+    checkInput: function(text){
+      // if input is null, remove selected item last time
+      this.show();
+      if(text.length==0){
+        $(this).removeClass('hover');
+        if(this.hasCurrentSelectedItem()){
+          this.currentSelectedItem.removeClass('selected');
+        }   
+      }
+    },
+
     filter: function(){
       var text = this.input.val();
+      // from here: https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+      text = text.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       this.items.find('.searchable-select-item').addClass('searchable-select-hide');
       this.items.find('.searchable-select-item:searchableSelectContains('+text+')').removeClass('searchable-select-hide');
+      this.checkInput(text);
       if(this.currentSelectedItem.hasClass('searchable-select-hide') && this.items.find('.searchable-select-item:not(.searchable-select-hide)').length > 0){
         this.hoverFirstNotHideItem();
       }
@@ -210,6 +230,12 @@
     },
 
     selectItem: function(item){
+      // if selected item's value is None, end it
+      var value = item.data('value');
+      if(value==="None"){
+        return
+      };
+
       if(this.hasCurrentSelectedItem())
         this.currentSelectedItem.removeClass('selected');
 
@@ -222,6 +248,10 @@
       var value = item.data('value');
       this.holder.data('value', value);
       this.element.val(value);
+
+      // add selected result to input
+      this.input.val(item.text());
+      this.input.text(item.text());
 
       if(this.options.afterSelectItem){
         this.options.afterSelectItem.apply(this);
