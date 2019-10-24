@@ -26,6 +26,16 @@
   font-family: sans-serif;
 }
 
+/*remove x in input in IE*/
+/*.searchable-select-input::-ms-clear{
+  display: none;
+}
+*/
+.searchable-select-inpu{input { &::-ms-clear { display: none; } }}  
+/*.searchable-select-inpu::-ms-clear{display: none;}*/
+/*.searchable-select-inpu::-ms-reveal{display: none;}*/
+
+
 .searchable-select-item {
   padding: 5px 0px;
   min-height: 22px;
